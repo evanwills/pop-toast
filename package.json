@@ -1,0 +1,26 @@
+{
+  "name": "pop-toast",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/pop-toast.es.js",
+  "exports": {
+    ".": "./dist/pop-toast.es.js"
+  },
+  "types": "types/pop-toast.d.ts",
+  "files": [
+    "dist",
+    "types"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "lit": "^2.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.4",
+    "vite": "^3.1.0"
+  }
+}

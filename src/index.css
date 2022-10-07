@@ -1,0 +1,71 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+h1 {
+  font-size: 1.4em;
+  /* color: #3c1053; */
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+pop-toast {
+  --toast-pos: fixed;
+  --toast-left: 1rem;
+  --toast-right: 1rem;
+  --toast-bottom: 1rem;
+  --toast-top: 1rem;
+  --toast-overflow: auto;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+}
+
+@media screen and (min-width: 28rem) {
+  pop-toast {
+    --toast-width: 20rem;
+  }
+}
+
+@media screen and (min-width: 48rem) {
+  pop-toast {
+    --toast-width: 25rem;
+  }
+}
+
+@media screen and (min-width: 62rem) {
+  pop-toast {
+    --toast-width: 30rem;
+  }
+}

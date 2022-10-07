@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>&lt;pop-toast&gt;</title>
+    <link rel="stylesheet" href="./src/index.css" />
+    <script type="module" src="/src/pop-toast.ts"></script>
+  </head>
+  <body>
+    <pop-toast label="Toast is aweful" id="blah" position="bottom-left">
+		<div slot="head">
+			<h1>Why toast is useful</h1>
+		</div>
+		<div slot="teaser">
+			<p>
+				Toast is a good way to use bread that is stale. (It makes it you feel like you intended it to be stale. Rather than being stuck with bread you'd rather chuck out.)
+			</p>
+		</div>
+		<div slot="body">
+			<p>
+				There are many things you can do with toast such as:
+			</p>
+			<ul>
+				<li>Use it to squash cockroaches or flys in your home</li>
+				<li>Throw it like a frisbee at your annoying sibling while your parents are arguing about pointless things.</li>
+				<li>Use a lighter to burn images of deity and sell it as a religious icon</li>
+				<li>Slather it with peanut button and honey and leave it on the table to catch flys</li>
+				<li>If you are really desperate you could even eat it.</li>
+			</ul>
+			<p>
+				Learn more about
+				<a href="https://css-tricks.com/toast/">toast</a>.
+			</p>
+		</div>
+    </pop-toast>
+  </body>
+</html>
