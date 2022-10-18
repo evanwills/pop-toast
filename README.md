@@ -1,5 +1,24 @@
 # `<POP-TOAST>`
 
+* [Introduction](#introduction)
+* [Attributes](#attributes)
+  * [position](#position)
+  * [hideonreload](#hideonreload)
+  * [moretxt](#moretxt)
+  * [label](#label)
+  * [closeChar](#closeChar)
+  * [id](#id)
+* [Slots](#slots)
+  * [head](#head)
+  * [teaser](#teaser)
+  * [body](#body)
+* [Styling](#styling)
+
+----
+
+
+## Introduction
+
 `<pop-toast>` is used to show a cancelable message in an unobtrusive
 manner. If, like me, you don't know what a toast component is, read
 this post by [Chris Coyier](https://css-tricks.com/toast/)
@@ -48,13 +67,6 @@ or when loaded on a different page.
 > __Note also:__ If the user's browser doesn't support local storage or
 >           the user has blocked local storage, this will have no
 >           effect.
-
-### ``
-
-Normally, when the close button is clicked the toast just vanishes.
-If `hideonreload` is TRUE, an entry is added to local storage to
-prevent a toast with the same ID from being rendered after reload
-or when loaded on a different page.
 
 ### `moretxt`
 
