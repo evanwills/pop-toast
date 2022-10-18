@@ -32,7 +32,7 @@ If empty, it will default to the being inline where the HTML is
 rendered. This can be overridden by setting CSS Custom Properties
 via an external style sheet.
 
-### `hidedxpanded`
+### `hideonreload`
 
 Normally, when the close button is clicked the toast just vanishes.
 When the page is reloaded or the same toast is rendered on a
@@ -41,19 +41,20 @@ as an attribute in `<pop-toast>`, an entry is added to local storage
 to prevent a toast with the same ID from being rendered after reload
 or when loaded on a different page.
 
-> __Note:__ If the user's browser doesn't support local storage or
+> __Note:__ For `hideonreload` to work, the `<pop-toast>` element
+>           __*must*__ have an ID. If it doesn't, an reliable key
+            cannot be set in local storage.
+
+> __Note also:__ If the user's browser doesn't support local storage or
 >           the user has blocked local storage, this will have no
 >           effect.
 
-### `hideonreload`
+### ``
 
 Normally, when the close button is clicked the toast just vanishes.
 If `hideonreload` is TRUE, an entry is added to local storage to
 prevent a toast with the same ID from being rendered after reload
 or when loaded on a different page.
-
-> __Note:__ For `hideonreload` to work, the `<pop-toast>` element
->           must have an ID
 
 ### `moretxt`
 
