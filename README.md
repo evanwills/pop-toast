@@ -1,18 +1,25 @@
 # `<POP-TOAST>`
 
 * [Introduction](#introduction)
+* [HTML](#html)
 * [Attributes](#attributes)
   * [position](#position)
   * [hideonreload](#hideonreload)
   * [moretxt](#moretxt)
   * [label](#label)
   * [closeChar](#closeChar)
+  * [delay](#delay)
   * [id](#id)
 * [Slots](#slots)
   * [head](#head)
   * [teaser](#teaser)
   * [body](#body)
 * [Styling](#styling)
+  * [Toast *(main block)*](#toast-main-block)
+  * [slide *(off screen position)*](#slide-off-screen-position)
+  * [Close button](#close-button)
+  * [Toast label](#toast-label)
+  * [Read more/expand button](#read-moreexpand-button)
 
 ----
 
@@ -29,6 +36,34 @@ with extra functionality inspired by the
 [University of Sydney's Library site's](https://www.library.sydney.edu.au/) use of a toast component to inform users about cultural issues the site might pose.
 
 It (hopefully) has sensible defaults that can easily be overridden either with attributes for behaviour or [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) for styling
+
+## HTML
+
+```html
+<pop-toast label="Toast label" id="this-is-toast" position="bottom-right">
+    <div slot="head">
+        <h1>Toast heading</h1>
+    </div>
+    <div slot="teaser">
+        <p>
+            Teaser text to make people want to read more. Or (if
+            there isn't much to say) the entire text you want the
+            user to see.
+        </p>
+    </div>
+    <div slot="body">
+        <p>
+            This is where you put the more verbose but (maybe) not
+            as important text you'd really like people to read but
+            are ok if the can't be bothered.
+        </p>
+        <p>
+            Learn more about
+            <a href="https://css-tricks.com/toast/">toast</a>.
+        </p>
+    </div>
+</pop-toast>
+```
 
 ## Attributes
 
@@ -68,6 +103,10 @@ or when loaded on a different page.
 >           the user has blocked local storage, this will have no
 >           effect.
 
+### `hideexpanded`
+
+Normally when the "more..." button is clicked (when toast has extra body) the body is shown and nothing else happens. But if `hideExpanded` is TRUE, when the "more..." button is clicked but the toast isn't closed, next time a toast with the same ID is loaded, it will be hidden.
+
 ### `moretxt`
 
 Override the text shown in the read more button.<br />
@@ -82,6 +121,12 @@ will be rendered as the label for the component.
 
 Override the character(s) shown in the close button.<br />
 [Default: "_X_"]
+
+### `delay`
+
+The number of seconds delay between when the toast block renders and
+when it slides into view<br />
+[Default: "_1_"]
 
 ### `id`
 
@@ -101,7 +146,7 @@ from the pages HTML within a web component.
 Content within each slot will be styled like it would be elsewhere
 on the page.
 
-`<pop-toast>` has three named slots
+`<pop-toast>` has three named slots. Each of which is optional. However you should always have either `teaser` or `body` (or both)
 
 ### `head`
 
@@ -117,40 +162,6 @@ Teaser content for the tost.
 Extra content that is hidden by default when the toast is rendered
 but can be shown by clicking on the 'more...' button.
 
-```html
-<pop-toast label="Stale bread???" id="pop-toast" position="bottom-left">
-    <div slot="head">
-        <h1>Why toast is useful</h1>
-    </div>
-    <div slot="teaser">
-        <p>
-            Toast is a good way to use bread that is stale. (It makes
-            it you feel like you intended it to be stale. Rather than
-            being stuck with bread you'd rather chuck out.)
-        </p>
-    </div>
-    <div slot="body">
-        <p>
-            There are many things you can do with toast such as:
-        </p>
-        <ul>
-            <li>Use it to squash cockroaches or flys in your home</li>
-            <li>Throw it like a frisbee at your annoying sibling
-                while your parents are arguing about pointless
-                things.</li>
-            <li>Use a lighter to burn images of your chosen deity
-                and sell it on ebay</li>
-            <li>Slather it with peanut button and honey and leave
-                it on the table to catch flys</li>
-            <li>If you are really desperate you could even eat it.</li>
-        </ul>
-        <p>
-            Learn more about
-            <a href="https://css-tricks.com/toast/">toast</a>.
-        </p>
-    </div>
-</pop-toast>
-```
 
 -----
 
@@ -163,94 +174,152 @@ component itself. To achieve this there are a number of
 [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties)
 that can be set via the pages style sheet.
 
-You can also use media queries to override any of the custom properties at break points you prefer
+You can also use media queries to override any of the custom
+properties at break points you prefer.
 
-### `--toast-border`
+> __Note:__ Where available I use shorthand CSS properties to give
+>           the greatest flixiblity in styling with the least number
+>           of variables to manage.
 
-Used to style the border around the toast component.<br />
-[Default: `0.05rem solid #fff`]
+### Toast *(main block)*
 
-### `--toast-bottom`
+#### `--toast-bg`
+
+Controls the [background](https://developer.mozilla.org/en-US/docs/Web/CSS/background)
+of the toast block<br />
+[Default: `#fff`]
+
+#### `--toast-border`
+
+Used to style the [border](https://developer.mozilla.org/en-US/docs/Web/CSS/border)
+around the toast component.<br />
+[Default: `0.05rem solid #000`]
+
+#### `--toast-bottom`
 
 Offset of the component from the bottom of the window (when `fixed`) or the bottom of the nearest positioned element (when `absolute`).<br />
 [Default: `auto`]
 
-### `--toast-height`
+#### `--toast-height`
 
 Height of toast component<br />
 [Default: `auto`]
 
-### `--toast-left`
+#### `--toast-left`
 
 Offset of the component from the left side of the window (when `fixed`) or the left side of the nearest positioned element (when `absolute`).<br />
-[Default: `50%`]
+[Default: `1rem`]
 
-### `--toast-overflow`
+#### `--toast-max-width`
+
+Maximum width of the toast block<br />
+[Default: `25rem`]
+
+#### `--toast-overflow`
 
 Overflow control for toast content area<br />
 [Default: `auto`]
 
-
-### `--toast-padding`
+#### `--toast-padding`
 
 Padding for toast's wrapping div<br />
 [Default: `1rem`]
 
-### `--toast-position`
+#### `--toast-position`
 
 How the whole toast component is positioned.<br />
 [Default: `fixed`]
 
-### `--toast-right`
+#### `--toast-right`
 
 Offset of the component from the right side of the window (when `fixed`) or the right side of the nearest positioned element (when `absolute`).<br />
-[Default: `auto`]
+[Default: `1rem`]
 
-### `--toast-shadow`
+#### `--toast-shadow`
 
 Defines the styling of the box shadow for the whole toast component.<br />
-[Default: `0 0 0.5rem rgba(255, 255, 255, 0.5)`]
+[Default: `0 0 0.5rem rgba(0, 0, 0, 0.5)`]
 
-Font weight of the toast's title block<br />
-[Default: `bold`]
-
-### `--toast-top`
+#### `--toast-top`
 
 Offset of the component from the top of the window (when `fixed`) or the top of the nearest positioned element (when `absolute`).<br />
 [Default: `50%`]
 
-### `--toast-translate-x`
+#### `--toast-transition`
+
+Controls the animation used to slide the text block in after `<pop-toast>` is rendered. Note the minimum delay is one second. However<br />
+[Default: `50%`]
+
+#### `--toast-translate-x`
 
 How to transform/translate the toast component in the __X__ axis<br />
 [Default: `0`]
 
-
-### `--toast-translate-y`
+#### `--toast-translate-y`
 
 How to transform/translate the toast component in the __Y__ axis<br />
 [Default: `0`]
 
-
-### `--toast-width`
+#### `--toast-width`
 
 Controls the width of the toast component<br />
 [Default: `calc(100% - 2rem)`]
+
+#### `--toast-z`
+
+Controls the `z-index` of the toast component<br />
+[Default: `calc(100% - 2rem)`]
+
+-----
+
+### slide *(off screen position)*
+
+> __NOTE:__ To help user experience, the toast block slides in from
+>           its nearest side a second after the block is rendered.
+>           These two *slide* css custom properties allow you to
+>           control where the toast block sits before it slides into
+>           view. See []
+
+#### `--toast-slide-in-transform-left`
+
+Controls the where (for left side blocks) the toast is placed before
+slide-in animation runs<br />
+[Default: `translateX(-120%);`]
+
+#### `--toast-slide-in-transform-right`
+
+Controls the where (for right side blocks) the toast is placed before
+slide-in animation runs<br />
+[Default: `translateX(120%);`]
+
+#### `--toast-slide-out-transform-left`
+
+Controls the where (for top aligned blocks) the toast is placed after
+slide-out animation runs<br />
+[Default: `translateY(-140%);`]
+
+#### `--toast-slide-out-transform-right`
+
+Controls the where (for bottom aligned blocks) the toast is placed after
+slide-out animation runs<br />
+[Default: `translateY(140%);`]
 
 -----
 
 ### Close button
 
-#### `--toast-close-bg-colour`
+#### `--toast-close-bg`
 
-Background colour for close (X) button<br />
+[Background](https://developer.mozilla.org/en-US/docs/Web/CSS/background)
+for close (X) button<br />
 [Default: `transparent`]
 
 #### `--toast-close-border`
 
-Border styling for close button.<br />
+[Border](https://developer.mozilla.org/en-US/docs/Web/CSS/border) styling for close button.<br />
 [Default: `none`]
 
-#### `--toast-close-colour`
+#### `--toast-close-color`
 
 Font colour for close button<br />
 [Default: `inherit`]
@@ -279,20 +348,30 @@ Top offset for close button<br />
 
 ### Toast label
 
-#### `--toast-label-bg-colour`
+#### `--toast-label-align`
 
-Background colour for toast's label<br />
+Text alignment in toast's label<br />
+[Default: `inherit`]
+
+#### `--toast-label-bg`
+
+[Background](https://developer.mozilla.org/en-US/docs/Web/CSS/background) for toast's label<br />
 [Default: `inherit`]
 
 #### `--toast-label-border`
 
-Styling for border of toast's label<br />
+Styling for [border](https://developer.mozilla.org/en-US/docs/Web/CSS/border) of toast's label<br />
 [Default: `none`]
 
 #### `--toast-label-case`
 
-How to transform the text in the toast's label<br />
+How to transform the case of text in toast's label<br />
 [Default: `uppercase`]
+
+#### `--toast-label-color`
+
+Colour of text in toast's label<br />
+[Default: `inherit`]
 
 #### `--toast-label-decoration`
 
@@ -337,22 +416,24 @@ Font weight for toast's label<br />
 -----
 
 ### Read more/expand button
+
 #### `--toast-more-align`
 
 Text alignment for _more..._ button<br />
 [Default: `right`]
 
-#### `--toast-more-bg-colour`
+#### `--toast-more-bg`
 
-Background colour for _more..._ button<br />
+[Background](https://developer.mozilla.org/en-US/docs/Web/CSS/background)
+for _more..._ button<br />
 [Default: `inherit`]
 
 #### `--toast-more-border`
 
-Border styling for  for _more..._ button<br />
+[Border](https://developer.mozilla.org/en-US/docs/Web/CSS/border) styling for  for _more..._ button<br />
 [Default: `none`]
 
-#### `--toast-more-colour`
+#### `--toast-more-color`
 
 Text colour for _more..._ button<br />
 [Default: `inherit`]

@@ -9,7 +9,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
  * @csspart button - The button
  */
 @customElement('pop-toast')
-export class MyElement extends LitElement {
+export class PopToast extends LitElement {
   /**
    * Position on the page of the toast will be
    *
@@ -58,6 +58,19 @@ export class MyElement extends LitElement {
   closeChar : string = 'X';
 
   /**
+   * Number of seconds delay between when the toast block rendered
+   * and when it slides into view
+   */
+  @property({ type: Number })
+  delay : number = 1;
+
+  /**
+   * Used for testing local storage
+   */
+  @property({ type: Boolean })
+  debug : boolean = false;
+
+  /**
    * Whether or not the toast is expanded
    *
    * (Only relevant if toast has extra body content)
@@ -70,6 +83,18 @@ export class MyElement extends LitElement {
    */
   @state()
   closed : boolean = false;
+
+  /**
+   * Whether or not the toast block is waiting to slide in
+   */
+  @state()
+  slideIn : boolean = true;
+
+  /**
+   * Whether or not the toast block should slide out of view
+   */
+  @state()
+  slideOut : boolean = false;
 
   /**
    * Whether or not the init method has been called
@@ -88,21 +113,49 @@ export class MyElement extends LitElement {
    */
   private _hasBody: boolean = false;
 
+  /**
+   * Whether or not toast has extra body content
+   */
+  private _hasTeaser: boolean = false;
+
   static styles = css`
     :host {
-      --toast-border: 0.05rem solid #fff;
+      --toast-bg: fff;
+      --toast-border: 0.05rem solid #000;
       --toast-bottom: auto;
-      --toast-close-bg-colour: transparent;
+      --toast-height: auto;
+      --toast-left: 1rem;
+      --toast-max-width: 25rem;
+      --toast-overflow: auto;
+      --toast-padding: 1rem;
+      --toast-position: fixed;
+      --toast-right: 1rem;
+      --toast-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+      --toast-top: 1rem;
+      --toast-transition: transform ease-in-out 0.3s;
+      --toast-translate-x: 0;
+      --toast-translate-y: 0;
+      --toast-width: calc(100% - 2rem);
+      --toast-z: 100;
+
+      --toast-slide-in-transform-left: translateX(-120%);
+      --toast-slide-in-transform-right: translateX(120%);
+      --toast-slide-out-transform-top: translateY(-140%);
+      --toast-slide-out-transform-bottom: translateY(140%);
+
+      --toast-close-bg: transparent;
       --toast-close-border: none;
-      --toast-close-colour: inherit;
+      --toast-close-color: inherit;
       --toast-close-line-height: 1rem;
       --toast-close-padding: 0.25rem;
       --toast-close-right: 0;
       --toast-close-top: -0.3rem;
-      --toast-height: auto;
-      --toast-label-bg-colour: inherit;
+
+      --toast-label-align: inherit;
+      --toast-label-bg: inherit;
       --toast-label-border: none;
       --toast-label-case: uppercase;
+      --toast-label-color: inherit;
       --toast-label-decoration: none;
       --toast-label-family: inherit;
       --toast-label-line-height: 1rem;
@@ -111,33 +164,37 @@ export class MyElement extends LitElement {
       --toast-label-size: 0.875rem;
       --toast-label-style: normal;
       --toast-label-weight: bold;
-      --toast-left: 50%;
-      --toast-more-max-width: calc(100% - 2rem);
+
       --toast-more-align: right;
-      --toast-more-bg-colour: inherit;
+      --toast-more-bg: #fff;
       --toast-more-border: none;
-      --toast-more-colour: inherit;
+      --toast-more-bottom: 1.15rem;
+      --toast-more-color: #000;
       --toast-more-decoration: none;
       --toast-more-family: inherit;
-      --toast-more-margin: -2.1rem 0 0 0;
+      --toast-more-left: auto;
+      --toast-more-margin: -2.7rem 0 0 0;
+      --toast-more-max-width: calc(100% - 2rem);
       --toast-more-padding: 0;
+      --toast-more-right: 1rem;
       --toast-more-size: 0.875rem;
       --toast-more-style: normal;
       --toast-more-weight: normal;
-      --toast-overflow: auto;
-      --toast-padding: 1rem;
-      --toast-position: fixed;
-      --toast-right: auto;
-      --toast-shadow: 0 0 0.5rem rgba(255, 255, 255, 0.5);
-      --toast-top: 50%;
-      --toast-translate-x: 0;
-      --toast-translate-y: 0;
-      --toast-width: calc(100% - 2rem);
+      --toast-more-width: 4rem;
+
+      --toast-more-b-width: 10rem;
+      --toast-more-b-bottom: auto;
+      --toast-more-b-left: auto;
+      --toast-more-b-right: 1rem;
+      --toast-more-b-align: center;
+      --toast-more-b-height: 1rem;
+      --toast-more-b-bg: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.8) 66%, rgba(255,255,255,1) 100%);
     }
     .closed {
       display: none;
     }
     .toast {
+      background: var(--toast-bg);
       border: var(--toast-border);
       box-shadow: var(--toast-shadow);
       box-sizing: border-box;
@@ -147,8 +204,10 @@ export class MyElement extends LitElement {
       padding: var(--toast-padding);
       position: var(--toast-position);
       top:  var(--toast-top);
-      width: var(--toast-width);
       transform: translate(var(--toast-translate-x), var(--toast-translate-y));
+      transition: var(--toast-transition);
+      width: var(--toast-width);
+      z-index: var(--toast-z);
     }
     .toast.top-right {
       bottom: auto;
@@ -207,6 +266,26 @@ export class MyElement extends LitElement {
       right: auto;
       top: auto;
     }
+    .toast.top-left.slide-in,
+    .toast.middle-left.slide-in,
+    .toast.bottom-left.slide-in {
+      transform: var(--toast-slide-in-transform-left);
+    }
+    .toast.top-right.slide-in,
+    .toast.middle-right.slide-in,
+    .toast.bottom-right.slide-in {
+      transform: var(--toast-slide-in-transform-right);
+    }
+    .toast.top-left.slide-out,
+    .toast.top-centre.slide-out,
+    .toast.top-right.slide-out {
+      transform: var(--toast-slide-out-transform-top);
+    }
+    .toast.bottom-left.slide-out,
+    .toast.bottom-centre.slide-out,
+    .toast.bottom-right.slide-out {
+      transform: var(--toast-slide-out-transform-bottom);
+    }
     .toast-header {
       position: relative;
     }
@@ -215,7 +294,8 @@ export class MyElement extends LitElement {
     }
     .label {
       border: var(--toast-label-border);
-      background-color: var(--toast-label-bg-colour);
+      background: var(--toast-label-bg);
+      color: var(--toast-label-color);
       margin: var(--toast-label-margin);
       padding: var(--toast-label-padding);
       font-family: var(--toast-label-family);
@@ -223,14 +303,15 @@ export class MyElement extends LitElement {
       font-style: var(--toast-label-style);
       font-weight: var(--toast-label-weight);
       line-height: var(--toast-label-line-height);
+      text-align: var(--toast-label-align);
       text-transform: var(--toast-label-case);
       text-decoration: var(--toast-label-decoration);
     }
     .close {
       display: inline-block;
-      background-color: var(--toast-close-bg-colour);
-      border: var(--toast-close-border)
-      color: var(--toast-close-colour);
+      background: var(--toast-close-bg);
+      border: var(--toast-close-border);
+      color: var(--toast-close-color);
       cursor: pointer;
       font-family: var(--toast-close-family);
       font-size: var(--toast-close-size);
@@ -243,20 +324,33 @@ export class MyElement extends LitElement {
       right: var(--toast-close-right);
     }
     .more {
-      background-color: var(--toast-more-bg-colour);
+      background: var(--toast-more-bg);
       border: var(--toast-more-border);
-      color: var(--toast-more-colour);
+      bottom: var(--toast-more-bottom);
+      color: var(--toast-more-color);
       cursor: pointer;
-      display: block;
+      display: inline-block;
       font-family: var(--toast-more-family);
       font-size: var(--toast-more-size);
       font-style: var(--toast-more-style);
       font-weight: var(--toast-more-weight);
+      left: var(--toast-more-left);
       margin: var(--toast-more-margin);
       padding: var(--toast-more-padding);
+      position: absolute;
+      right: var(--toast-more-right);
       text-align: var(--toast-more-align);
       text-decoration: var(--toast-more-decoration);
-      width: 100%;
+      width: var(--toast-more-width);
+    }
+    .more::before {
+      content: '';
+      background: var(--toast-more-b-bg);
+      display: inline-block;
+      height: var(--toast-more-b-height);
+      left: calc(var(--toast-more-b-width) * -1);
+      position: absolute;
+      width: var(--toast-more-b-width);
     }
   `;
 
@@ -264,8 +358,9 @@ export class MyElement extends LitElement {
    * Handle close toast click
    */
   private _clickClose() {
-    this.closed = !this.closed;
+    this.slideOut = true;
     this._setClosed();
+    setTimeout(this._delayClose(this), 5000);
   }
 
   /**
@@ -278,12 +373,27 @@ export class MyElement extends LitElement {
     }
   }
 
+  private _delayClose(data : PopToast) : Function {
+    return () => {
+      data.closed = !data.closed;
+    }
+  }
+
   /**
    * Set the local storage so
    */
   private _setClosed() {
     if (this._lsKey !== '') {
+
       window.localStorage.setItem(this._lsKey, 'closed');
+    }
+
+    this.dispatchEvent(new Event('popclose'));
+  }
+
+  private _slideIn(data: PopToast) : Function {
+    return () => {
+      data.slideIn = false;
     }
   }
 
@@ -294,8 +404,6 @@ export class MyElement extends LitElement {
   private _doInit() : void {
     if (this._init === false) {
       this._init = true;
-
-      console.log('this:', this)
 
       // Try and find a standard position
       if (this.position !== '') {
@@ -340,49 +448,42 @@ export class MyElement extends LitElement {
       // Check whether or not the `body` slot is empty.
       const bodySlot = this.querySelector('*[slot="body"]')
       this._hasBody = (bodySlot !== null && bodySlot.innerHTML.trim() !== '');
+      // Check whether or not the `body` slot is empty.
+      const teaserSlot = this.querySelector('*[slot="teaser"]')
+      this._hasTeaser = (teaserSlot !== null && teaserSlot.innerHTML.trim() !== '');
+
+      setTimeout(this._slideIn(this), (this.delay * 1000));
     }
   }
 
   /**
    * Test whether or not the browser has local storage enabled
    *
-   * This is taken from https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
+   * Taken from [stackoverflow](https://stackoverflow.com/questions/16427636/check-if-localstorage-is-available#answer-16427725).
+   * (See also: [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API))
    *
    * @returns TRUE if localStorage is available. FALSE otherwise
    */
   private _storageAvailable() : boolean {
-    let storage;
-    try {
-      if (typeof window.localStorage !== 'undefined') {
-        storage = window.localStorage;
-        const x = '__storage_test__';
-        storage.setItem(x, x);
-        storage.removeItem(x);
-        return true;
-      } else {
-        return false;
+    if (typeof window.localStorage !== 'undefined') {
+      try {
+        var tmp = '__storage_test__';
+        localStorage.setItem(tmp, tmp);
+        if (localStorage.getItem(tmp) === tmp) {
+            localStorage.removeItem(tmp);
+            // localStorage is enabled
+            return true;
+        } else {
+            // localStorage is disabled
+            return false
+        }
+      } catch(e) {
+        // localStorage is disabled
+        return false
       }
-    }
-    catch (e) {
-      const output : boolean = (
-        typeof e !== 'undefined' &&
-        e instanceof DOMException &&
-        (
-          // everything except Firefox
-          e.code === 22 ||
-          // Firefox
-          e.code === 1014 ||
-          // test name field too, because code might not be
-          // present everything except Firefox
-          e.name === 'QuotaExceededError' ||
-          // Firefox
-          e.name === 'NS_ERROR_DOM_QUOTA_REACHED' &&
-          // acknowledge QuotaExceededError only if there's something already stored
-          (storage && storage.length !== 0)
-        )
-      )!;
-
-      return output;
+    } else {
+      // localStorage is not available
+      return false
     }
   }
 
@@ -394,7 +495,10 @@ export class MyElement extends LitElement {
       : undefined;
 
     return html`
-      <div class="toast${this.position} ${(!this.closed) ? 'open' : 'closed'}" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast${this.position}${(this.slideIn ? ' slide-in': '')}${(this.slideOut ? ' slide-out': '')} ${(!this.closed) ? 'open' : 'closed'}"
+           role="alert"
+           aria-live="assertive"
+           aria-atomic="true">
         <div class="toast-header">
           ${(this.label !== '')
             ? html`<p class="label">${this.label}</p>`
@@ -404,13 +508,19 @@ export class MyElement extends LitElement {
         </div>
         <div class="toast-body">
           <slot name="head"></slot>
-          <slot name="teaser"></slot>
-          ${(this._hasBody)
+          ${(this._hasTeaser)
             ? html`
-                ${(this.expanded)
-                  ? html`<slot name="body"></slot>`
-                  : html`<button class="more" @click=${this._clickExpand} tabindex=${ifDefined(tab)}>${this.moreTxt}</button>`
-                }`
+                <div class="teaser">
+                  <slot name="teaser"></slot>
+                  ${(this._hasBody && !this.expanded)
+                    ? html`<button class="more" @click=${this._clickExpand} tabindex=${ifDefined(tab)}>${this.moreTxt}</button>`
+                    : ''
+                  }
+                </div>`
+            : ''
+          }
+          ${(this._hasBody  && (!this._hasTeaser || this.expanded))
+            ? html`<slot name="body"></slot>`
             : ''
           }
         </div>
@@ -421,6 +531,6 @@ export class MyElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'pop-toast': MyElement
+    'pop-toast': PopToast
   }
 }

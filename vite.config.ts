@@ -8,9 +8,23 @@ export default defineConfig({
       formats: ['es']
     },
     rollupOptions: {
+      // output: {
+      //   format: 'es',
+      //   compact: true
+      // },
       external: ''
       // external: /^lit/
       // external: mode === "production" ? "" : /^lit-element/,
+      // output: {
+      //   generatedCode: {
+      //     // arrowFunctions: false,
+      //     preset: 'es2015'
+      //   }
+      // }
     }
+    // minify: 'terser'
+  },
+  server: {
+    port: 3014
   }
 })

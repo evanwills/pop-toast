@@ -7,15 +7,17 @@
     <title>&lt;pop-toast&gt;</title>
     <link rel="stylesheet" href="./src/index.css" />
     <script type="module" src="/src/pop-toast.ts"></script>
+    <!-- <script type="module" src="/dist/pop-toast.js"></script> -->
   </head>
   <body>
-    <pop-toast label="Toast is aweful" id="blah" position="bottom-left">
+    <!-- <pop-toast label="Toast is awful" id="blah" position="bottom-right" hideonreload hideexpanded debug> -->
+	<pop-toast label="Toast is awful" id="blah" position="bottom-right" debug>
 		<div slot="head">
 			<h1>Why toast is useful</h1>
 		</div>
 		<div slot="teaser">
 			<p>
-				Toast is a good way to use bread that is stale. (It makes it you feel like you intended it to be stale. Rather than being stuck with bread you'd rather chuck out.)
+				Toast is a good way to use bread that is stale. (It makes it you feel like you intended it to be stale. Rather than being stuck with bread you'd rather chuck out.) I really, really don't like toast.
 			</p>
 		</div>
 		<div slot="body">
@@ -35,5 +37,6 @@
 			</p>
 		</div>
     </pop-toast>
+	<script type="text/javascript" src="src/test-close.js"></script>
   </body>
 </html>

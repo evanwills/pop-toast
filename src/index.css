@@ -6,7 +6,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #fff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -29,20 +29,31 @@ h1 {
 }
 
 body {
+  background-color: #030303;
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: #fff;
 }
 
 pop-toast {
-  --toast-pos: fixed;
-  --toast-left: 1rem;
-  --toast-right: 1rem;
+  color: #000;
+  --toast-bg: #fff;
   --toast-bottom: 1rem;
-  --toast-top: 1rem;
+  --toast-left: 1rem;
   --toast-overflow: auto;
+  --toast-pos: fixed;
+  --toast-right: 1rem;
+  --toast-shadow: 0.2rem 0.2rem 0.5rem rgba(255, 255, 255, 0.5);
+  --toast-top: 1rem;
+  --toast-more-bg: #fff;
+  --toast-more-color: #000;
+  --toast-more-b-bg: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 66%, rgba(255, 255, 255, 1) 100%);
+}
+pop-toast p {
+  margin-bottom: 0;
 }
 
 @media (prefers-color-scheme: light) {
